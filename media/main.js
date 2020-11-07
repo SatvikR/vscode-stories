@@ -2,6 +2,10 @@
 // It cannot access the main VS Code APIs directly.
 (function () {
   const vscode = acquireVsCodeApi();
+  const LOAD_BUTTON_CONTENT = {
+    "loading": `Loading<span class="one">.</span><span class="two">.</span><span class="three">.</span>`,
+    "ready": "Load More",
+  };
   const imgMap = {
     flutter:
       "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iNDgiIGhlaWdodD0iNDgiCnZpZXdCb3g9IjAgMCAxNzIgMTcyIgpzdHlsZT0iIGZpbGw6IzAwMDAwMDsiPjxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0ibm9uemVybyIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIHN0cm9rZS1kYXNoYXJyYXk9IiIgc3Ryb2tlLWRhc2hvZmZzZXQ9IjAiIGZvbnQtZmFtaWx5PSJub25lIiBmb250LXdlaWdodD0ibm9uZSIgZm9udC1zaXplPSJub25lIiB0ZXh0LWFuY2hvcj0ibm9uZSIgc3R5bGU9Im1peC1ibGVuZC1tb2RlOiBub3JtYWwiPjxwYXRoIGQ9Ik0wLDE3MnYtMTcyaDE3MnYxNzJ6IiBmaWxsPSJub25lIj48L3BhdGg+PGc+PHBhdGggZD0iTTkzLjE2NjY3LDE0LjMzMzMzbC03MS42NjY2Nyw3MS42NjY2N2wyMS41LDIxLjVsOTMuMTY2NjcsLTkzLjE2NjY3eiIgZmlsbD0iIzQwYzRmZiI+PC9wYXRoPjxwYXRoIGQ9Ik0xMzYuMTY2NjcsNzguODMzMzNsLTM5LjQxNjY3LDM5LjQxNjY3bC0yMS41LC0yMS41bDE3LjkxNjY3LC0xNy45MTY2N3oiIGZpbGw9IiM0MGM0ZmYiPjwvcGF0aD48cmVjdCB4PSItMTIuNzI4OTUiIHk9IjMzLjk0MDYyIiB0cmFuc2Zvcm09InJvdGF0ZSgtNDUuMDAxKSBzY2FsZSgzLjU4MzMzLDMuNTgzMzMpIiB3aWR0aD0iOC40ODUiIGhlaWdodD0iOC40ODUiIGZpbGw9IiMwM2E5ZjQiPjwvcmVjdD48cGF0aCBkPSJNMTM2LjE2NjY3LDE1Ny42NjY2N2gtNDNsLTE3LjkxNjY3LC0xNy45MTY2N2wyMS41LC0yMS41eiIgZmlsbD0iIzAxNTc5YiI+PC9wYXRoPjxwYXRoIGQ9Ik03NS4yNSwxMzkuNzVsMzIuMjUsLTEwLjc1bC0xMC43NSwtMTAuNzV6IiBmaWxsPSIjMDg0OTk0Ij48L3BhdGg+PC9nPjwvZz48L3N2Zz4=",
@@ -92,10 +96,19 @@
     }
   }
   loadStuff();
+
+  function toggleLoadingIndicator(target, loading){
+    target.disabled = loading;
+    let content = loading? LOAD_BUTTON_CONTENT.loading : LOAD_BUTTON_CONTENT.ready;
+    target.innerHTML = content;
+  }
+  
   document.querySelector(".load-more").addEventListener("click", async (e) => {
-    e.target.disabled = true;
+    let { target } = e;
+    toggleLoadingIndicator(target, true);
+    await wait(3000);
     await loadStuff();
-    e.target.disabled = false;
+    toggleLoadingIndicator(target, false);
   });
 
   window.addEventListener("message", (event) => {
